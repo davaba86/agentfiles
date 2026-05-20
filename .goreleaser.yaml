@@ -21,6 +21,9 @@ builds:
     ldflags:
       - -s -w -X main.version={{.Version}}
 
+universal_binaries:
+  - replace: true
+
 archives:
   - id: agentfiles
     formats:
