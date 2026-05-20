@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/davaba86/agentfiles/internal/initcmd"
 	"github.com/davaba86/agentfiles/internal/migrate"
@@ -27,7 +28,7 @@ func main() {
 	case "-h", "--help", "help":
 		usage()
 	case "-v", "--version", "version":
-		fmt.Fprintf(os.Stdout, "agentfiles %s\n", version)
+		fmt.Fprintf(os.Stdout, "agentfiles %s\n", displayVersion(version))
 	case "init":
 		if _, err := initcmd.Run(cwd, os.Stdout); err != nil {
 			fatal(err)
@@ -70,4 +71,15 @@ func usage() {
 func fatal(err error) {
 	fmt.Fprintln(os.Stderr, "error:", err)
 	os.Exit(1)
+}
+
+func displayVersion(v string) string {
+	v = strings.TrimSpace(v)
+	if v == "" {
+		return "dev"
+	}
+	if commit, ok := strings.CutPrefix(v, "HEAD-"); ok && commit != "" {
+		return fmt.Sprintf("dev (%s)", commit)
+	}
+	return v
 }

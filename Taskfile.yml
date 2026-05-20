@@ -25,3 +25,7 @@ tasks:
       - task: fmt
       - task: test
       - task: build
+
+  release:check:
+    cmds:
+      - goreleaser check
