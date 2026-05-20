@@ -1,0 +1,27 @@
+version: '3'
+
+tasks:
+  run:
+    cmds:
+      - go run ./cmd/agentfiles {{.CLI_ARGS}}
+
+  build:
+    vars:
+      VERSION:
+        sh: git describe --tags --always --dirty 2>/dev/null || echo dev
+    cmds:
+      - go build -ldflags "-X main.version={{.VERSION}}" -o bin/agentfiles ./cmd/agentfiles
+
+  test:
+    cmds:
+      - go test ./...
+
+  fmt:
+    cmds:
+      - gofmt -w .
+
+  check:
+    cmds:
+      - task: fmt
+      - task: test
+      - task: build

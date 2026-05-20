@@ -1,0 +1,19 @@
+canonical: AGENTS.md
+
+providers:
+  codex:
+    enabled: true
+    file: AGENTS.md
+
+  kimi:
+    enabled: true
+    file: AGENTS.md
+
+  claude:
+    enabled: true
+    file: CLAUDE.md
+    mode: bridge
+
+project:
+  require_readme: true
+  require_taskfile: true

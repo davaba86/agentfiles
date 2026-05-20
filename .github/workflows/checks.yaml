@@ -1,0 +1,43 @@
+name: Checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint, Test, Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: true
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+
+      - name: Check formatting
+        run: |
+          files="$(gofmt -l .)"
+          if [ -n "$files" ]; then
+            echo "Go files need gofmt:"
+            echo "$files"
+            exit 1
+          fi
+
+      - name: Test
+        run: task test
+
+      - name: Build
+        run: task build

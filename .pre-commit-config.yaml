@@ -1,0 +1,23 @@
+repos:
+  - repo: local
+    hooks:
+      - id: gofmt
+        name: gofmt
+        entry: gofmt -w
+        language: system
+        types:
+          - go
+
+      - id: go-test
+        name: go test
+        entry: task test
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: go-build
+        name: go build
+        entry: task build
+        language: system
+        pass_filenames: false
+        always_run: true
