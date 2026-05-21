@@ -1,0 +1,52 @@
+name: Auto Tag
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  auto-tag:
+    name: Bump patch version and tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Skip if HEAD already tagged
+        id: check
+        run: |
+          if git describe --exact-match HEAD 2>/dev/null; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compute next patch tag
+        if: steps.check.outputs.skip == 'false'
+        id: bump
+        run: |
+          latest=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          if [ -z "$latest" ]; then
+            latest="v0.0.0"
+          fi
+          major=$(echo "$latest" | cut -d. -f1 | tr -d 'v')
+          minor=$(echo "$latest" | cut -d. -f2)
+          patch=$(echo "$latest" | cut -d. -f3)
+          new_tag="v${major}.${minor}.$((patch + 1))"
+          echo "new_tag=$new_tag" >> "$GITHUB_OUTPUT"
+          echo "Bumping from $latest to $new_tag"
+
+      - name: Create and push tag
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.bump.outputs.new_tag }}"
+          git push origin "${{ steps.bump.outputs.new_tag }}"
