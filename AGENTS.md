@@ -17,6 +17,7 @@ Before changing code, read:
 ## Instruction files
 
 - When updating AI instructions, always edit `AGENTS.md`.
+- Never edit `CLAUDE.md`, `GEMINI.md`, or any other agent-specific instruction file. `AGENTS.md` is the sole source of truth for shared rules. Edits to other instruction files are forbidden unless the user explicitly asks.
 
 ## Planning files
 
@@ -42,5 +43,7 @@ After editing:
 - Mention anything not verified.
 
 When working in a repository:
-- Do not push directly to `main` or `master` unless explicitly asked by the user.
-- Create a suitably named branch for the code changes, then open a pull request.
+- Do not create branches, push commits, or open PRs unless the user explicitly asks.
+- Never push directly to `main` or `master` under any circumstances unless the user explicitly asks.
+- Make code changes locally only.
+- When ready to run any git command (branching, committing, pushing, PR creation), ask the user for approval first and wait for confirmation before executing.
