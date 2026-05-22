@@ -44,6 +44,6 @@ After editing:
 
 When working in a repository:
 - Do not create branches, push commits, or open PRs unless the user explicitly asks.
-- Never push directly to `main` or `master` under any circumstances unless the user explicitly asks.
+- Never push directly to `main` or `master` under any circumstances. Even if the user says "proceed" to a plan that includes pushing to `main`, stop and ask again explicitly before executing the push.
 - Make code changes locally only.
 - When ready to run any git command (branching, committing, pushing, PR creation), ask the user for approval first and wait for confirmation before executing.
