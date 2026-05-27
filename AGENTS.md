@@ -42,6 +42,12 @@ After editing:
 - Summarize what changed.
 - Mention anything not verified.
 
+When building phased projects:
+- Split work into phases before starting.
+- Complete one phase, then stop and ask the user to confirm before proceeding to the next.
+- Do not execute multiple phases in sequence without explicit approval between each.
+- If a `PLAN-*.md` file exists for the project, update it after each phase to record what was completed.
+
 When working in a repository:
 - Do not create branches, push commits, or open PRs unless the user explicitly asks.
 - Never push directly to `main` or `master` under any circumstances. Even if the user says "proceed" to a plan that includes pushing to `main`, stop and ask again explicitly before executing the push.
