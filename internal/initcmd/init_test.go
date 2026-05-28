@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/davaba86/agentfiles"
 	"github.com/davaba86/agentfiles/internal/validate"
 )
 
@@ -40,6 +41,22 @@ func TestRunCreatesRepoThatPassesValidation(t *testing.T) {
 	}
 	if !result.OK() {
 		t.Fatalf("expected initialized repo to pass validation")
+	}
+}
+
+func TestRunUsesRootInstructions(t *testing.T) {
+	dir := t.TempDir()
+	var out bytes.Buffer
+
+	if _, err := Run(dir, &out); err != nil {
+		t.Fatalf("Run returned error: %v", err)
+	}
+	data, err := os.ReadFile(filepath.Join(dir, "AGENTS.md"))
+	if err != nil {
+		t.Fatalf("read initialized AGENTS.md: %v", err)
+	}
+	if string(data) != agentfiles.AgentsMD {
+		t.Fatalf("initialized AGENTS.md must match root AGENTS.md")
 	}
 }
 

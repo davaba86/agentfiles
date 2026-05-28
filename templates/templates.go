@@ -2,9 +2,6 @@ package templates
 
 import _ "embed"
 
-//go:embed AGENTS.md.tmpl
-var AgentsMD string
-
 //go:embed CLAUDE.md.tmpl
 var ClaudeMD string
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/davaba86/agentfiles"
 	"github.com/davaba86/agentfiles/internal/files"
 	"github.com/davaba86/agentfiles/templates"
 )
@@ -18,7 +19,7 @@ func Run(dir string, out io.Writer) (Result, error) {
 		name    string
 		content string
 	}{
-		{name: "AGENTS.md", content: templates.AgentsMD},
+		{name: "AGENTS.md", content: agentfiles.AgentsMD},
 		{name: "CLAUDE.md", content: templates.ClaudeMD},
 		{name: "README.md", content: templates.ReadmeMD},
 		{name: "Taskfile.yml", content: templates.TaskfileYML},
