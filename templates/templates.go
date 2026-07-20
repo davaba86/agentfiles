@@ -1,8 +1,8 @@
 package templates
 
 import (
-	"fmt"
 	_ "embed"
+	"fmt"
 )
 
 //go:embed README.md.tmpl
