@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/davaba86/agentfiles/internal/config"
 	"github.com/davaba86/agentfiles/templates"
 )
 
@@ -13,7 +14,7 @@ func TestRunDryRunDoesNotWriteFiles(t *testing.T) {
 	dir := oldClaudeRepo(t)
 	var out bytes.Buffer
 
-	if err := Run(dir, Options{DryRun: true, Backup: true}, &out); err != nil {
+	if err := Run(dir, Options{DryRun: true, Backup: true}, config.Default(), &out); err != nil {
 		t.Fatalf("Run returned error: %v", err)
 	}
 	if _, err := os.Stat(filepath.Join(dir, "AGENTS.md")); !os.IsNotExist(err) {
@@ -28,7 +29,7 @@ func TestRunMigratesClaudeFirstRepo(t *testing.T) {
 	dir := oldClaudeRepo(t)
 	var out bytes.Buffer
 
-	if err := Run(dir, Options{Backup: true}, &out); err != nil {
+	if err := Run(dir, Options{Backup: true}, config.Default(), &out); err != nil {
 		t.Fatalf("Run returned error: %v", err)
 	}
 
@@ -52,7 +53,7 @@ func TestRunMigratesClaudeFirstRepo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if string(claude) != templates.ClaudeMD {
+	if string(claude) != templates.ClaudeMDBridge("AGENTS.md") {
 		t.Fatalf("CLAUDE.md = %q, want bridge template", claude)
 	}
 }
@@ -67,7 +68,7 @@ func TestRunMigratesRepoWithExistingAgents(t *testing.T) {
 	}
 	var out bytes.Buffer
 
-	if err := Run(dir, Options{Backup: true}, &out); err != nil {
+	if err := Run(dir, Options{Backup: true}, config.Default(), &out); err != nil {
 		t.Fatalf("Run returned error: %v", err)
 	}
 
@@ -100,7 +101,7 @@ func TestRunMigratesRepoWithExistingAgents(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if string(claude) != templates.ClaudeMD {
+	if string(claude) != templates.ClaudeMDBridge("AGENTS.md") {
 		t.Fatalf("CLAUDE.md = %q, want bridge template", claude)
 	}
 }
@@ -116,7 +117,7 @@ func TestRunDoesNotAppendClaudeBridgeToExistingAgents(t *testing.T) {
 	}
 	var out bytes.Buffer
 
-	if err := Run(dir, Options{Backup: true}, &out); err != nil {
+	if err := Run(dir, Options{Backup: true}, config.Default(), &out); err != nil {
 		t.Fatalf("Run returned error: %v", err)
 	}
 
@@ -132,7 +133,7 @@ func TestRunDoesNotAppendClaudeBridgeToExistingAgents(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if string(claude) != templates.ClaudeMD {
+	if string(claude) != templates.ClaudeMDBridge("AGENTS.md") {
 		t.Fatalf("CLAUDE.md = %q, want bridge template", claude)
 	}
 }
@@ -148,7 +149,7 @@ func TestRunDoesNotAppendClaudeRulesAlreadyInAgents(t *testing.T) {
 	}
 	var out bytes.Buffer
 
-	if err := Run(dir, Options{Backup: true}, &out); err != nil {
+	if err := Run(dir, Options{Backup: true}, config.Default(), &out); err != nil {
 		t.Fatalf("Run returned error: %v", err)
 	}
 
@@ -158,6 +159,39 @@ func TestRunDoesNotAppendClaudeRulesAlreadyInAgents(t *testing.T) {
 	}
 	if string(agents) != agentsContent {
 		t.Fatalf("AGENTS.md = %q, want unchanged existing rules", agents)
+	}
+}
+
+func TestRunMigratesWithSubmodulePath(t *testing.T) {
+	dir := t.TempDir()
+	subDir := filepath.Join(dir, ".agent-config")
+	if err := os.MkdirAll(subDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "CLAUDE.md"), []byte("old claude rules\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cfg := config.Config{AgentsPath: ".agent-config/AGENTS.md"}
+	var out bytes.Buffer
+
+	if err := Run(dir, Options{Backup: true}, cfg, &out); err != nil {
+		t.Fatalf("Run returned error: %v", err)
+	}
+
+	agents, err := os.ReadFile(filepath.Join(dir, ".agent-config", "AGENTS.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(agents) != "old claude rules\n" {
+		t.Fatalf("AGENTS.md = %q, want copied Claude content", agents)
+	}
+
+	claude, err := os.ReadFile(filepath.Join(dir, "CLAUDE.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(claude) != templates.ClaudeMDBridge(".agent-config/AGENTS.md") {
+		t.Fatalf("CLAUDE.md = %q, want bridge for submodule path", claude)
 	}
 }
 

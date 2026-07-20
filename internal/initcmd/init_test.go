@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/davaba86/agentfiles"
+	"github.com/davaba86/agentfiles/internal/config"
 	"github.com/davaba86/agentfiles/internal/validate"
 )
 
@@ -35,7 +36,7 @@ func TestRunCreatesRepoThatPassesValidation(t *testing.T) {
 	if _, err := Run(dir, &out); err != nil {
 		t.Fatalf("Run returned error: %v", err)
 	}
-	result, err := validate.Run(dir, &out)
+	result, err := validate.Run(dir, config.Default(), &out)
 	if err != nil {
 		t.Fatalf("validate returned error: %v", err)
 	}

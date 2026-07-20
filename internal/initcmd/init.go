@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/davaba86/agentfiles"
+	"github.com/davaba86/agentfiles/internal/config"
 	"github.com/davaba86/agentfiles/internal/files"
 	"github.com/davaba86/agentfiles/templates"
 )
@@ -20,7 +21,7 @@ func Run(dir string, out io.Writer) (Result, error) {
 		content string
 	}{
 		{name: "AGENTS.md", content: agentfiles.AgentsMD},
-		{name: "CLAUDE.md", content: templates.ClaudeMD},
+		{name: "CLAUDE.md", content: templates.ClaudeMDBridge(config.Default().AgentsPath)},
 		{name: "README.md", content: templates.ReadmeMD},
 		{name: "Taskfile.yml", content: templates.TaskfileYML},
 		{name: ".agentfiles.yml", content: templates.AgentfilesYML},

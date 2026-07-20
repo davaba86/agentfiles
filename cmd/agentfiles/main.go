@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/davaba86/agentfiles/internal/config"
 	"github.com/davaba86/agentfiles/internal/initcmd"
 	"github.com/davaba86/agentfiles/internal/migrate"
 	"github.com/davaba86/agentfiles/internal/validate"
@@ -34,7 +35,11 @@ func main() {
 			fatal(err)
 		}
 	case "check":
-		result, err := validate.Run(cwd, os.Stdout)
+		cfg, err := config.Load(cwd)
+		if err != nil {
+			fatal(err)
+		}
+		result, err := validate.Run(cwd, cfg, os.Stdout)
 		if err != nil {
 			fatal(err)
 		}
@@ -48,7 +53,11 @@ func main() {
 		if err := fs.Parse(os.Args[2:]); err != nil {
 			fatal(err)
 		}
-		if err := migrate.Run(cwd, migrate.Options{DryRun: *dryRun, Backup: *backup}, os.Stdout); err != nil {
+		cfg, err := config.Load(cwd)
+		if err != nil {
+			fatal(err)
+		}
+		if err := migrate.Run(cwd, migrate.Options{DryRun: *dryRun, Backup: *backup}, cfg, os.Stdout); err != nil {
 			fatal(err)
 		}
 	default:
