@@ -8,6 +8,15 @@ repos:
         types:
           - go
 
+      - id: go-vet
+        name: go vet
+        entry: go vet
+        language: system
+        types:
+          - go
+        pass_filenames: false
+        always_run: true
+
       - id: go-test
         name: go test
         entry: task test

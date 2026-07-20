@@ -36,6 +36,9 @@ jobs:
             exit 1
           fi
 
+      - name: Vet
+        run: go vet ./...
+
       - name: Test
         run: task test
 
