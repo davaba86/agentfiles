@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/davaba86/agentfiles/internal/config"
 	"github.com/davaba86/agentfiles/internal/files"
 )
 
@@ -28,17 +29,17 @@ func (r Result) OK() bool {
 	return true
 }
 
-func Run(dir string, out io.Writer) (Result, error) {
+func Run(dir string, cfg config.Config, out io.Writer) (Result, error) {
 	result := Result{}
 
-	agentsPath := files.Join(dir, "AGENTS.md")
+	agentsPath := files.Join(dir, cfg.AgentsPath)
 	claudePath := files.Join(dir, "CLAUDE.md")
 
 	agentsExists, err := files.Exists(agentsPath)
 	if err != nil {
-		return result, fmt.Errorf("check AGENTS.md: %w", err)
+		return result, fmt.Errorf("check %s: %w", cfg.AgentsPath, err)
 	}
-	result.Checks = append(result.Checks, foundCheck("AGENTS.md", agentsExists))
+	result.Checks = append(result.Checks, foundCheck(cfg.AgentsPath, agentsExists))
 
 	claudeExists, err := files.Exists(claudePath)
 	if err != nil {
@@ -50,7 +51,7 @@ func Run(dir string, out io.Writer) (Result, error) {
 	if agentsExists {
 		agents, err = files.Read(agentsPath)
 		if err != nil {
-			return result, fmt.Errorf("read AGENTS.md: %w", err)
+			return result, fmt.Errorf("read %s: %w", cfg.AgentsPath, err)
 		}
 	}
 	if claudeExists {
@@ -62,13 +63,13 @@ func Run(dir string, out io.Writer) (Result, error) {
 
 	if claudeExists {
 		result.Checks = append(result.Checks, Check{
-			Message: "CLAUDE.md references AGENTS.md",
-			OK:      strings.Contains(string(claude), "AGENTS.md"),
+			Message: fmt.Sprintf("CLAUDE.md references %s", cfg.AgentsPath),
+			OK:      strings.Contains(string(claude), cfg.AgentsPath),
 		})
 	}
 	if agentsExists && claudeExists {
 		result.Checks = append(result.Checks, Check{
-			Message: "CLAUDE.md is not a full duplicate of AGENTS.md",
+			Message: fmt.Sprintf("CLAUDE.md is not a full duplicate of %s", cfg.AgentsPath),
 			OK:      !bytes.Equal(bytes.TrimSpace(agents), bytes.TrimSpace(claude)),
 		})
 	}

@@ -6,13 +6,15 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/davaba86/agentfiles/internal/config"
 )
 
 func TestRunPassesForValidRepo(t *testing.T) {
 	dir := validRepo(t)
 	var out bytes.Buffer
 
-	result, err := Run(dir, &out)
+	result, err := Run(dir, config.Default(), &out)
 	if err != nil {
 		t.Fatalf("Run returned error: %v", err)
 	}
@@ -25,7 +27,7 @@ func TestRunOutputsASCIIStatusMarkers(t *testing.T) {
 	dir := validRepo(t)
 	var out bytes.Buffer
 
-	if _, err := Run(dir, &out); err != nil {
+	if _, err := Run(dir, config.Default(), &out); err != nil {
 		t.Fatalf("Run returned error: %v", err)
 	}
 	output := out.String()
@@ -44,7 +46,7 @@ func TestRunFailsWhenAgentsMissing(t *testing.T) {
 	}
 	var out bytes.Buffer
 
-	result, err := Run(dir, &out)
+	result, err := Run(dir, config.Default(), &out)
 	if err != nil {
 		t.Fatalf("Run returned error: %v", err)
 	}
@@ -60,12 +62,41 @@ func TestRunFailsWhenClaudeDoesNotReferenceAgents(t *testing.T) {
 	}
 	var out bytes.Buffer
 
-	result, err := Run(dir, &out)
+	result, err := Run(dir, config.Default(), &out)
 	if err != nil {
 		t.Fatalf("Run returned error: %v", err)
 	}
 	if result.OK() {
 		t.Fatalf("expected missing AGENTS.md reference to fail")
+	}
+}
+
+func TestRunPassesForSubmodulePath(t *testing.T) {
+	dir := t.TempDir()
+	subDir := filepath.Join(dir, ".agent-config")
+	if err := os.MkdirAll(subDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	filemap := map[string]string{
+		".agent-config/AGENTS.md": "# shared rules\n",
+		"CLAUDE.md":               "@.agent-config/AGENTS.md\n",
+		"README.md":               "# readme\n",
+		"Taskfile.yml":            "version: '3'\n",
+		".agentfiles.yml":         "canonical: .agent-config/AGENTS.md\n",
+	}
+	for name, content := range filemap {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(content), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	cfg := config.Config{AgentsPath: ".agent-config/AGENTS.md"}
+	var out bytes.Buffer
+	result, err := Run(dir, cfg, &out)
+	if err != nil {
+		t.Fatalf("Run returned error: %v", err)
+	}
+	if !result.OK() {
+		t.Fatalf("expected submodule repo to pass:\n%s", out.String())
 	}
 }
 
