@@ -1,3 +1,0 @@
-[submodule ".agent-config"]
-	path = .agent-config
-	url = https://gitlab.com/mecha-consulting/mc-platform-agents.git
