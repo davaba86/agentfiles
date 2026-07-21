@@ -1,7 +1,7 @@
 @../mc-platform-agents/AGENTS.md
 @AGENTS.md
 
-# Claude-specific notes
+# Gemini-specific notes
 
 Shared project rules belong in AGENTS.md.
-Only put Claude Code-specific behavior here.
+Only put Gemini-specific behavior here.
