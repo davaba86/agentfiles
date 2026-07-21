@@ -1,4 +1,4 @@
-@.agent-config/AGENTS.md
+@../mc-platform-agents/AGENTS.md
 @AGENTS.md
 
 # Gemini-specific notes
