@@ -1,2 +1,7 @@
 /bin/
 docs/superpowers/
+
+# Implementation plan files (delete after implementation)
+PLAN*.md
+docs/superpowers/plans/
+docs/plans/
